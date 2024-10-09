@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GameRes.Formats.NonColor;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -18,9 +19,22 @@ namespace SchemeTool
                 GameRes.FormatCatalog.Instance.DeserializeScheme(stream);
             }
 
-            GameRes.Formats.KiriKiri.Xp3Opener format = GameRes.FormatCatalog.Instance.ArcFormats
-                .FirstOrDefault(a => a is GameRes.Formats.KiriKiri.Xp3Opener) as GameRes.Formats.KiriKiri.Xp3Opener;
+            GameRes.Formats.Entis.NoaOpener format = GameRes.FormatCatalog.Instance.ArcFormats
+                           .FirstOrDefault(a => a is GameRes.Formats.Entis.NoaOpener) as GameRes.Formats.Entis.NoaOpener;
+            string name = "Manyokko ☆ Makorin ~Boku mo Mahou Shoujo!?~";
+            if (format != null)
+            {
+                GameRes.Formats.Entis.NoaScheme scheme = format.Scheme as GameRes.Formats.Entis.NoaScheme;
+                
 
+                if (scheme.KnownKeys.ContainsKey(name)) scheme.KnownKeys.Remove(name);
+                scheme.KnownKeys[name] = new Dictionary<string, string>
+                {
+                    { "d01.dat", "cfduys54Rg(uycUIGD" },
+                    { "d03.dat", "ijh&ubt0867t6FTYU" }
+                };
+            }
+#if false
             if (format != null)
             {
                 GameRes.Formats.KiriKiri.Xp3Scheme scheme = format.Scheme as GameRes.Formats.KiriKiri.Xp3Scheme;
@@ -48,14 +62,19 @@ namespace SchemeTool
 
                 scheme.KnownSchemes.Add("game title", crypt);
             }
+#endif
 
             var gameMap = typeof(GameRes.FormatCatalog).GetField("m_game_map", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)
                 .GetValue(GameRes.FormatCatalog.Instance) as Dictionary<string, string>;
 
             if (gameMap != null)
             {
+                string game = "manyo2.exe";
+                if (gameMap.ContainsKey(game)) gameMap.Remove(game);
                 // Add file name here
-                gameMap.Add("game.exe", "game title");
+                gameMap.Add(game, name);
+                
+
             }
 
             // Save database
